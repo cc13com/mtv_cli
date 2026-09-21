@@ -99,6 +99,23 @@ def download_film(options,film):
   rc = p.returncode
   Msg.msg("INFO",
       "Ende  Download (%s) %s (Return-Code: %d)" % (size,film.titel[0:50],rc))
+
+  # Download Check mit ffmpeg
+  # voher einmalig ffmpeg installieren: sudo apt-get install ffmpeg
+
+  if rc==0:
+    Msg.msg("INFO", "Start Film Check %s" % (film.titel[0:50]))
+    check = subprocess.run(
+        ["ffmpeg", "-v", "error", "-i", ziel, "-f", "null", "-"],
+        stdout=DEVNULL,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    if check.stderr:
+        Msg.msg("ERROR", "ffmpeg meldet Fehler:\n%s" % check.stderr)
+        rc = 1
+
   if rc==0:
     options.filmDB.update_downloads(_id,'K')
     options.filmDB.save_recs(_id,ziel)
