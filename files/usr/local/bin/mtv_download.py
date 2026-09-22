@@ -101,9 +101,9 @@ def download_film(options,film):
       "Ende  Download (%s) %s (Return-Code: %d)" % (size,film.titel[0:50],rc))
 
   # Download Check mit ffmpeg
-  # voher einmalig ffmpeg installieren: sudo apt-get install ffmpeg
+  movie_check = options.config["MOVIE_CHECK"]
 
-  if rc==0:
+  if rc==0 and movie_check == "true":
     Msg.msg("INFO", "Start Film Check %s" % (film.titel[0:50]))
     check = subprocess.run(
         ["ffmpeg", "-v", "error", "-i", ziel, "-f", "null", "-"],
@@ -111,6 +111,7 @@ def download_film(options,film):
         stderr=subprocess.PIPE,
         text=True
     )
+    Msg.msg("INFO", "Ende Film Check %s" % (film.titel[0:50]))
 
     if check.stderr:
         Msg.msg("ERROR", "ffmpeg meldet Fehler:\n%s" % check.stderr)
